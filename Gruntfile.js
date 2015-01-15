@@ -10,11 +10,11 @@ module.exports = function(grunt) {
         separator: ';'
       },
       lib: {
-        src: ['public/lib/*.js'],
+        src: ['public/lib/jquery.js','public/lib/underscore.js', 'public/lib/handlebars.js', 'public/lib/backbone.js'],
         dest: 'public/dist/lib/lib.js'
       },
       app: {
-        src: ['public/client/*.js'],
+        src: ['public/client/app.js', 'public/client/link.js', 'public/client/links.js', 'public/client/linkView.js', 'public/client/linksView.js', 'public/client/createLinkView.js', 'public/client/router.js'],
         dest: 'public/dist/client/app.js'
       }
     },
@@ -132,9 +132,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('upload', function(n) {
     if(grunt.option('prod')) {
-      // add your production server task here
-      grunt.task.run(['shell:scaleUpAzure', 'shell:pushToAzure', 'shell:scaleDownAzure'])
-
+      grunt.task.run(['shell:scaleUpAzure', 'shell:pushToAzure', 'shell:scaleDownAzure']);
     } else {
       grunt.task.run([ 'server-dev' ]);
     }
@@ -143,6 +141,5 @@ module.exports = function(grunt) {
   grunt.registerTask('deploy', [
     'build','test', 'jshint', 'upload'
   ]);
-
 
 };
