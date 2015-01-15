@@ -30,7 +30,10 @@
     "mongoose": "~3.8.8",
     "bluebird": "1.0.8"
   },
-  "devDependencies": {
+  "devDependencies": {    
     "supertest": "^0.10.0"
-  }
+  },
+    "scripts": {
+      "npm test": "mocha ./test/ServerSpec.js"
+    }
 }

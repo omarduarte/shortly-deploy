@@ -1,8 +1,22 @@
 module.exports = function(grunt) {
 
+  var azureSiteName = 'omarduarte-shortly';
+
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+
     concat: {
+      options: {
+        separator: ';'
+      },
+      lib: {
+        src: ['public/lib/*.js'],
+        dest: 'public/dist/lib/lib.js'
+      },
+      app: {
+        src: ['public/client/*.js'],
+        dest: 'public/dist/client/app.js'
+      }
     },
 
     mochaTest: {
@@ -21,12 +35,18 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      lib : {
+        src:  'public/dist/lib/lib.js',
+        dest: 'public/dist/lib/lib.min.js'
+      },
+      app: {
+        src:  'public/dist/client/app.js',
+        dest: 'public/dist/client/app.min.js'
+      }
     },
 
     jshint: {
-      files: [
-        // Add filespec list here
-      ],
+      all: ['public/client/*.js'],
       options: {
         force: 'true',
         jshintrc: '.jshintrc',
@@ -38,6 +58,11 @@ module.exports = function(grunt) {
     },
 
     cssmin: {
+      target: {
+        files: {
+          'public/dist/style.min.css': ['public/style.css']
+        }        
+      }
     },
 
     watch: {
@@ -58,7 +83,17 @@ module.exports = function(grunt) {
     },
 
     shell: {
-      prodServer: {
+      scaleUpAzure: {
+        command: 'azure site scale mode standard ' + azureSiteName
+      },
+      // log: {
+      //   command: 'azure site log tail ' + azureSiteName + ' > azurelog &'
+      // },
+      pushToAzure: {
+        command: 'git push azure master'
+      },
+      scaleDownAzure: {
+        command: 'azure site scale mode free ' + azureSiteName
       }
     },
   });
@@ -93,19 +128,20 @@ module.exports = function(grunt) {
     'mochaTest'
   ]);
 
-  grunt.registerTask('build', [
-  ]);
+  grunt.registerTask('build', ['concat', 'uglify', 'cssmin']);
 
   grunt.registerTask('upload', function(n) {
     if(grunt.option('prod')) {
       // add your production server task here
+      grunt.task.run(['shell:scaleUpAzure', 'shell:pushToAzure', 'shell:scaleDownAzure'])
+
     } else {
       grunt.task.run([ 'server-dev' ]);
     }
   });
 
   grunt.registerTask('deploy', [
-    // add your deploy tasks here
+    'build','test', 'jshint', 'upload'
   ]);
 
 
